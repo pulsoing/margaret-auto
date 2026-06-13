@@ -11,19 +11,25 @@ document.addEventListener("DOMContentLoaded", () => {
    ========================================================= */
 
 function initHeroSlider() {
-    const slides = document.querySelectorAll(".hero-slide");
+    const sliders = document.querySelectorAll(".hero-slider");
 
-    if (!slides.length) return;
+    if (!sliders.length) return;
 
-    let currentIndex = 0;
+    sliders.forEach((slider) => {
+        const slides = slider.querySelectorAll(".hero-slide");
 
-    setInterval(() => {
-        slides[currentIndex].classList.remove("active");
+        if (!slides.length) return;
 
-        currentIndex = (currentIndex + 1) % slides.length;
+        let currentIndex = 0;
 
-        slides[currentIndex].classList.add("active");
-    }, 5000);
+        setInterval(() => {
+            slides[currentIndex].classList.remove("active");
+
+            currentIndex = (currentIndex + 1) % slides.length;
+
+            slides[currentIndex].classList.add("active");
+        }, 5000);
+    });
 }
 
 /* =========================================================

@@ -264,6 +264,14 @@ section {
     transition: opacity 1s ease, transform 5s ease;
 }
 
+.hero-slider-mobile {
+    display: none;
+}
+
+.hero-slider-desktop {
+    display: block;
+}
+
 .hero-slide.active {
     opacity: 1;
     transform: scale(1);
@@ -864,6 +872,31 @@ section {
         height: 56px;
         right: 18px;
         bottom: 18px;
+    }
+
+    .hero-slider-desktop {
+        display: none;
+    }
+
+    .hero-slider-mobile {
+        display: block;
+    }
+
+    .hero-slider {
+        height: 42vh;
+        min-height: 260px;
+        max-height: 420px;
+    }
+
+    .hero-slide {
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .hero-overlay {
+        background: linear-gradient(180deg,
+                rgba(16, 20, 24, 0.08),
+                rgba(16, 20, 24, 0.12));
     }
 }
 
