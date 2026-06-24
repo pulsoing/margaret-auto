@@ -198,7 +198,7 @@ function initQuoteForm() {
             mensaje
         });
 
-        const whatsappUrl = `https://wa.me/56982185894?text=${encodeURIComponent(whatsappMessage)}`;
+        const whatsappUrl = `https://wa.me/56982195894?text=${encodeURIComponent(whatsappMessage)}`;
 
         window.open(whatsappUrl, "_blank");
 
