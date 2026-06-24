@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initVehicleFilters();
     initQuoteButtons();
     initQuoteForm();
+    initHeroVideoSound();
 });
 
 /* =========================================================
@@ -21,14 +22,64 @@ function initHeroSlider() {
         if (!slides.length) return;
 
         let currentIndex = 0;
+        let sliderTimer;
 
-        setInterval(() => {
-            slides[currentIndex].classList.remove("active");
+        function stopVideoInSlide(slide) {
+            const video = slide.querySelector(".hero-video-frame video");
+
+            if (!video) return;
+
+            video.pause();
+            video.muted = true;
+            video.currentTime = 0;
+
+            const button = slide.querySelector(".video-sound-btn");
+            const icon = button?.querySelector("i");
+
+            if (button && icon) {
+                icon.className = "fas fa-volume-mute";
+                button.setAttribute("aria-label", "Activar sonido");
+            }
+        }
+
+        function playVideoInSlide(slide) {
+            const video = slide.querySelector(".hero-video-frame video");
+
+            if (!video) return;
+
+            video.muted = true;
+            video.currentTime = 0;
+
+            video.play().catch(() => {
+                // Algunos navegadores pueden bloquear el autoplay.
+            });
+        }
+
+        function changeSlide() {
+            const currentSlide = slides[currentIndex];
+
+            currentSlide.classList.remove("active");
+            stopVideoInSlide(currentSlide);
 
             currentIndex = (currentIndex + 1) % slides.length;
 
-            slides[currentIndex].classList.add("active");
-        }, 5000);
+            const nextSlide = slides[currentIndex];
+            nextSlide.classList.add("active");
+            playVideoInSlide(nextSlide);
+
+            const isVideoSlide = nextSlide.classList.contains("hero-video-slide");
+            const duration = isVideoSlide ? 10000 : 5000;
+
+            sliderTimer = setTimeout(changeSlide, duration);
+        }
+
+        const firstSlide = slides[currentIndex];
+        playVideoInSlide(firstSlide);
+
+        const firstSlideIsVideo = firstSlide.classList.contains("hero-video-slide");
+        const initialDuration = firstSlideIsVideo ? 10000 : 5000;
+
+        sliderTimer = setTimeout(changeSlide, initialDuration);
     });
 }
 
@@ -170,4 +221,139 @@ Contacto preferido: ${contactoPreferido}
 Mensaje:
 ${mensaje || "Sin mensaje adicional."}
     `.trim();
+}
+
+function initHeroSlider() {
+    const sliders = document.querySelectorAll(".hero-slider");
+
+    if (!sliders.length) return;
+
+    function stopAllVideosInSlide(slide) {
+        slide.querySelectorAll("video").forEach((video) => {
+            video.pause();
+            video.muted = true;
+            video.currentTime = 0;
+        });
+
+        const button = slide.querySelector(".video-sound-btn");
+        const icon = button?.querySelector("i");
+
+        if (button && icon) {
+            icon.className = "fas fa-volume-mute";
+            button.setAttribute("aria-label", "Activar sonido");
+        }
+    }
+
+    function playVideosInSlide(slide) {
+        const videos = slide.querySelectorAll("video");
+
+        videos.forEach((video) => {
+            video.muted = true;
+            video.currentTime = 0;
+
+            video.play().catch(() => {
+                // Autoplay puede ser bloqueado por el navegador.
+            });
+        });
+    }
+
+    sliders.forEach((slider) => {
+        const slides = slider.querySelectorAll(".hero-slide");
+
+        if (!slides.length) return;
+
+        let currentIndex = 0;
+
+        // Detiene todos los videos de este slider al iniciar.
+        slides.forEach((slide) => stopAllVideosInSlide(slide));
+
+        const firstSlide = slides[currentIndex];
+        firstSlide.classList.add("active");
+        playVideosInSlide(firstSlide);
+
+        function changeSlide() {
+            const currentSlide = slides[currentIndex];
+
+            currentSlide.classList.remove("active");
+            stopAllVideosInSlide(currentSlide);
+
+            currentIndex = (currentIndex + 1) % slides.length;
+
+            const nextSlide = slides[currentIndex];
+            nextSlide.classList.add("active");
+            playVideosInSlide(nextSlide);
+
+            const duration = nextSlide.classList.contains("hero-video-slide")
+                ? 10000
+                : 5000;
+
+            setTimeout(changeSlide, duration);
+        }
+
+        const initialDuration = firstSlide.classList.contains("hero-video-slide")
+            ? 10000
+            : 5000;
+
+        setTimeout(changeSlide, initialDuration);
+    });
+}
+
+function initHeroVideoSound() {
+    const soundButtons = document.querySelectorAll(".video-sound-btn");
+
+    soundButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const currentSlide = button.closest(".hero-video-slide");
+
+            if (!currentSlide) return;
+
+            const videosInCurrentSlide = currentSlide.querySelectorAll("video");
+            const mainVideo = currentSlide.querySelector(".hero-video-frame video");
+            const icon = button.querySelector("i");
+
+            if (!mainVideo || !icon) return;
+
+            const willActivateSound = mainVideo.muted;
+
+            // Silencia y pausa TODOS los videos que no pertenezcan
+            // a la diapositiva actual.
+            document.querySelectorAll(".hero-video-slide").forEach((slide) => {
+                if (slide !== currentSlide) {
+                    slide.querySelectorAll("video").forEach((video) => {
+                        video.pause();
+                        video.muted = true;
+                        video.currentTime = 0;
+                    });
+
+                    const otherButton = slide.querySelector(".video-sound-btn");
+                    const otherIcon = otherButton?.querySelector("i");
+
+                    if (otherButton && otherIcon) {
+                        otherIcon.className = "fas fa-volume-mute";
+                        otherButton.setAttribute("aria-label", "Activar sonido");
+                    }
+                }
+            });
+
+            if (willActivateSound) {
+                // Fondo siempre queda sin sonido.
+                videosInCurrentSlide.forEach((video) => {
+                    video.muted = true;
+                });
+
+                // Solo el video visible puede tener audio.
+                mainVideo.muted = false;
+                mainVideo.volume = 1;
+                mainVideo.play();
+
+                icon.className = "fas fa-volume-up";
+                button.setAttribute("aria-label", "Silenciar video");
+            } else {
+                mainVideo.muted = true;
+
+                icon.className = "fas fa-volume-mute";
+                button.setAttribute("aria-label", "Activar sonido");
+            }
+        });
+    });
 }
