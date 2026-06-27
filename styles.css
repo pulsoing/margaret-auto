@@ -779,6 +779,17 @@ section {
     font-size: 0.9rem;
 }
 
+.footer a {
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.footer a:hover {
+    color: var(--color-accent);
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
